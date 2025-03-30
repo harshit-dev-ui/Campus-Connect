@@ -35,7 +35,7 @@ const server = http.createServer(app);
 // Configure Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: "https://campus-connect-1tr3.onrender.com/",
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   },
@@ -56,7 +56,7 @@ app.use(express.json());
 // Configure CORS
 app.use(
   cors({
-    origin: "https://campus-connect-1tr3.onrender.com/",
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
