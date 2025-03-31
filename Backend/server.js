@@ -35,7 +35,7 @@ const server = http.createServer(app);
 // Configure Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allows requests from any origin
+    origin: "https://hubster.onrender.com", // Allows requests from any origin
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true, // Allows cookies and authentication headers
   },
