@@ -35,11 +35,14 @@ const server = http.createServer(app);
 // Configure Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: "https://hubster.onrender.com", // Allows requests from any origin
+    origin: (origin, callback) => {
+      callback(null, true); // Dynamically allow all origins
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true, // Allows cookies and authentication headers
+    credentials: true, // Allows cookies/auth headers
   },
 });
+
 
 
 
@@ -53,9 +56,12 @@ app.use(cookieParser());
 app.use(express.json());
 
 // Configure CORS
-app.use(
-  cors()
-);
+app.use(cors({
+  origin: "https://hubster.onrender.com",
+  credentials: true, // Allows cookies/auth headers
+  
+}));
+
 
 // Make io and cloudinary available throughout the app
 app.set("io", io);
