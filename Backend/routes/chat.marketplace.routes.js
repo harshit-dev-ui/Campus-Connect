@@ -8,7 +8,7 @@ const router = express.Router();
 // Fetch chat inbox for the logged-in user with unread count calculation
 router.get("/inbox", protectRoute, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) return res.status(400).json({ error: "User ID required" });
 
     const chats = await Chat.find({
@@ -52,7 +52,7 @@ router.get("/inbox", protectRoute, async (req, res) => {
 router.get("/:sellerId", protectRoute, async (req, res) => {
   try {
     const { sellerId } = req.params;
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
     let chat = await Chat.findOne({
@@ -115,7 +115,7 @@ router.post("/send", protectRoute, async (req, res) => {
 router.put("/mark-read", protectRoute, async (req, res) => {
   try {
     const { chatId } = req.body;
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!chatId || !userId) {
       return res.status(400).json({ error: "Chat ID and User ID are required" });
     }
