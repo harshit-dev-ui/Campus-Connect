@@ -26,7 +26,7 @@ import User from "./models/user.model.js";
 import { sendMeetingLinkEmail } from "./utils/emailUtils.js";
 import StudyRoom from "./models/room.model.js";
 import groupRoutes from "./routes/groupChat.routes.js";
-import cloudinary from "./config/cloudinary.js"; // Ensure Cloudinary is imported
+import cloudinary from "./config/cloudinary.js"; 
 import { log } from "console";
 dotenv.config();
 const app = express();
@@ -35,14 +35,13 @@ const server = http.createServer(app);
 // Configure Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: "https://hubster.onrender.com",
+    origin: "*", // Allows requests from any origin
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true,
+    credentials: true, // Allows cookies and authentication headers
   },
 });
 
-// // Security middleware
-// app.use(helmet());
+
 
 // Add timer management
 const activeTimers = new Map(); // Track active timers per room
