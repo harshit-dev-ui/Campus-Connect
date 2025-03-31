@@ -54,12 +54,7 @@ app.use(express.json());
 
 // Configure CORS
 app.use(
-  cors({
-    origin: "https://hubster.onrender.com",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  cors()
 );
 
 // Make io and cloudinary available throughout the app
