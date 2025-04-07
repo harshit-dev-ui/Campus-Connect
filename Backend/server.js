@@ -354,7 +354,7 @@ io.on("connection", (socket) => {
       const room = io.sockets.adapter.rooms[roomId];
       const updatedSize = room ? room.size : 0;
       if(updatedSize==0){
-         StudyRoom.deleteOne({ _id: roomId }).then((data)=>{
+         StudyRoom.deleteOne({  roomId }).then((data)=>{
           console.log("deleted!")
          });
       }
