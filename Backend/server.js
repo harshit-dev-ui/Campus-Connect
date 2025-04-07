@@ -354,9 +354,30 @@ io.on("connection", (socket) => {
       const room = io.sockets.adapter.rooms[roomId];
       const updatedSize = room ? room.size : 0;
       if(updatedSize==0){
-         StudyRoom.deleteOne({  roomId }).then((data)=>{
-          console.log("deleted!")
-         });
+        try{
+            StudyRoom.findOneAndUpdate(
+              { roomId }, // Match the document by roomId
+              { $pull: { participants: { userId: socket.userId } } }, // Remove the object with matching userId from participants array
+              { returnDocument: 'after' } // Return the updated document after the update
+            ).then((updatedDoc) => {
+              if (updatedDoc && updatedDoc.participants.length === 0) {
+                // If participants array is empty, delete the document
+                StudyRoom.deleteOne({ roomId }).then(() => {
+                  console.log("Room deleted as no participants are left.");
+                }).catch((err) => {
+                  console.error("Error deleting room:", err);
+                });
+              }
+            }).catch((err) => {
+              console.error("Error updating room:", err);
+            });
+
+
+            
+        }catch(err){
+          console.log(err);
+        }
+         
       }
   });
 });
