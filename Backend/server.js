@@ -50,7 +50,7 @@ const io = new Server(server, {
 const activeTimers = new Map(); // Track active timers per room
 const users = new Map(); // Track online users
 const whiteboardState = {}; // Store whiteboard lines for each room
-
+const socketToroomId=new Map();
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
@@ -100,6 +100,7 @@ io.on("connection", (socket) => {
     socket.on("joinRoom", async (roomId) => {
       try {
         socket.join(roomId);
+        socketToroomId.set(socket,roomId);
         console.log(`Socket ${socket.id} joined room ${roomId}`);
 
         // Send current room state
@@ -349,8 +350,14 @@ io.on("connection", (socket) => {
   handleMarketChatEvents();
 
   socket.on("disconnect", () => {
-    // console.log("User disconnected:", socket.id);
-    // Cleanup any room-specific timers if needed
+      let roomId=socketToroomId.get(socket);
+      const room = io.sockets.adapter.rooms[roomId];
+      const updatedSize = room ? room.size : 0;
+      if(updateSize==0){
+         StudyRoom.deleteOne({ _id: roomId }).then((data)=>{
+          console.log("deleted!")
+         });
+      }
   });
 });
 
