@@ -26,7 +26,7 @@ import User from "./models/user.model.js";
 import { sendMeetingLinkEmail } from "./utils/emailUtils.js";
 import StudyRoom from "./models/room.model.js";
 import groupRoutes from "./routes/groupChat.routes.js";
-import cloudinary from "./config/cloudinary.js"; 
+import cloudinary from "./config/cloudinary.js"; // Ensure Cloudinary is imported
 import { log } from "console";
 dotenv.config();
 const app = express();
@@ -35,33 +35,33 @@ const server = http.createServer(app);
 // Configure Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: (origin, callback) => {
-      callback(null, true); // Dynamically allow all origins
-    },
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true, // Allows cookies/auth headers
+    credentials: true,
   },
 });
 
-
-
+// // Security middleware
+// app.use(helmet());
 
 // Add timer management
 const activeTimers = new Map(); // Track active timers per room
 const users = new Map(); // Track online users
 const whiteboardState = {}; // Store whiteboard lines for each room
-const socketToroomId=new Map();
+
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
 
 // Configure CORS
-app.use(cors({
-  origin: "https://hubster.onrender.com",
-  credentials: true, // Allows cookies/auth headers
-  
-}));
-
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL, 
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Make io and cloudinary available throughout the app
 app.set("io", io);
@@ -93,14 +93,11 @@ io.on("connection", (socket) => {
     }
   });
 
-
-
   // Study Room Events
   const handleStudyRoomEvents = () => {
     socket.on("joinRoom", async (roomId) => {
       try {
         socket.join(roomId);
-        socketToroomId.set(socket,roomId);
         console.log(`Socket ${socket.id} joined room ${roomId}`);
 
         // Send current room state
@@ -135,18 +132,33 @@ io.on("connection", (socket) => {
     });
 
     // Listen for whiteboardLine events and update whiteboard state
-  socket.on("whiteboardLine", ({ roomId, line, sender }) => {
-    if (!whiteboardState[roomId]) whiteboardState[roomId] = [];
-    whiteboardState[roomId].push(line);
-    io.in(roomId).emit("whiteboardLine", { roomId, line, sender });
-  });
+    socket.on("whiteboardLine", ({ roomId, line, sender }) => {
+      if (!whiteboardState[roomId]) whiteboardState[roomId] = [];
+      whiteboardState[roomId].push(line);
+      console.log("Whiteboard line received:", line);
+      io.in(roomId).emit("whiteboardLine", { roomId, line, sender });
+    });
 
-  // When a client requests whiteboard data
-  socket.on("requestWhiteboardData", ({ roomId }) => {
-    if (whiteboardState[roomId]) {
-      socket.emit("whiteboardData", { roomId, lines: whiteboardState[roomId] });
-    }
-  });
+    // When a client requests whiteboard data
+    socket.on("requestWhiteboardData", ({ roomId }) => {
+      if (whiteboardState[roomId]) {
+        socket.emit("whiteboardData", {
+          roomId,
+          lines: whiteboardState[roomId],
+        });
+      }
+    });
+    socket.on("drawC",({ roomId, line,sender }) => {
+      io.in(roomId).emit("drawA", { roomId, line, sender });
+    })
+
+    // Handle clear canvas event
+    socket.on("clearWhiteboard", ({ roomId }) => {
+      if (whiteboardState[roomId]) {
+        whiteboardState[roomId] = []; // Clear the state in memory
+        io.in(roomId).emit("whiteboardCleared"); // Notify all participants in the room
+      }
+    });
 
 
     // startTimer handler
@@ -245,7 +257,7 @@ io.on("connection", (socket) => {
       console.log(`User ${userId} joined their personal room`);
     });
 
-    socket.on("sendMessage", (message) => {
+    socket.on("sendingMessage", (message) => {
       const { senderId, receiverId } = message;
       // Use the same room naming strategy
       const chatRoom = [senderId, receiverId].sort().join("-");
@@ -350,35 +362,8 @@ io.on("connection", (socket) => {
   handleMarketChatEvents();
 
   socket.on("disconnect", () => {
-      let roomId=socketToroomId.get(socket);
-      const room = io.sockets.adapter.rooms[roomId];
-      const updatedSize = room ? room.size : 0;
-      if(updatedSize==0){
-        try{
-            StudyRoom.findOneAndUpdate(
-              { roomId }, // Match the document by roomId
-              { $pull: { participants: { userId: socket.userId } } }, // Remove the object with matching userId from participants array
-              { returnDocument: 'after' } // Return the updated document after the update
-            ).then((updatedDoc) => {
-              if (updatedDoc && updatedDoc.participants.length === 0) {
-                // If participants array is empty, delete the document
-                StudyRoom.deleteOne({ roomId }).then(() => {
-                  console.log("Room deleted as no participants are left.");
-                }).catch((err) => {
-                  console.error("Error deleting room:", err);
-                });
-              }
-            }).catch((err) => {
-              console.error("Error updating room:", err);
-            });
-
-
-            
-        }catch(err){
-          console.log(err);
-        }
-         
-      }
+    // console.log("User disconnected:", socket.id);
+    // Cleanup any room-specific timers if needed
   });
 });
 

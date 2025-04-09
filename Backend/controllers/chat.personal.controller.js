@@ -247,7 +247,7 @@ export const deleteMessage = async (req, res) => {
     }
 
     // Check if the user is the sender
-    if (message.sender.toString() !== userId) {
+    if (message.sender.toString() !== userId.toString()) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 

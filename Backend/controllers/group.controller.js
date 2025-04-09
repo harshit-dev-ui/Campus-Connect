@@ -379,7 +379,7 @@ export const deleteGroupMessage = async (req, res) => {
     req.io.to(groupId).emit("deleteGroupMessage", messageId);
     const message = await Message.findById(messageId);
     if (!message) return res.status(404).json({ message: "Message not found" });
-    if (message.sender.toString() !== userId)
+    if (message.sender.toString() !== userId.toString())
       return res.status(403).json({ message: "Unauthorized" });
     await message.deleteOne();
     res.json({ message: "Message deleted successfully" });
