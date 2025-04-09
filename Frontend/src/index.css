@@ -44,3 +44,12 @@
     transform: translateY(0);
   }
 }
+
+.ascii-logo-container {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  transform: scale(0.8);
+  transform-origin: left center;
+  width: 210px; /* Add this fixed width */
+}
