@@ -119,12 +119,12 @@ const WhiteboardKonva = ({ roomId, socket }) => {
       socket.on('whiteboardLine', (data) => {
         if (data.sender === socket.id) return;
         if (data.roomId !== roomId) return;
-        setLines((prev) => [...prev.splice(0,prev.length-1), data.line]);
+        setLines((prev) => [...prev.splice(0,prev.length-1), data.line,data.line]);
       });
       socket.on('drawA', (data) => {
         if (data.sender === socket.id) return;
         if (data.roomId !== roomId) return;
-        setLines((prev) => [...prev.splice(0,prev.length), data.line]);
+        setLines((prev) => [...prev.splice(0,prev.length), data.line,data.line]);
       })
     }
   }, [roomId, socket]);
