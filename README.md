@@ -67,8 +67,8 @@ A platform for students to connect, collaborate, and manage academic activities.
 - Mentors are visible only if approved by an admin.
 - Mentors can upload a profile photo to personalize their profiles.
 - Real-time chat with mentors.
-![Student & Mentor Management](Frontend/public/mentors.png)
-![Student & Mentor Management](Frontend/public/meeting.png)
+![Student & Mentor Management](Frontend/public/mentors.jpeg)
+![Student & Mentor Management](Frontend/public/meeting.jpeg)
 
 ### 6. Admin Role & Approvals
 
@@ -76,15 +76,15 @@ A platform for students to connect, collaborate, and manage academic activities.
 - Admins can promote students from other colleges to an admin role.
 - Admins can approve or reject mentorship applications.
 - Mentors are notified of approval or rejection decisions.
-![Admin Role & Approvals](Frontend/public/admin.png)
-![Admin Role & Approvals](Frontend/public/makeadmin.png)
+![Admin Role & Approvals](Frontend/public/admin.jpeg)
+![Admin Role & Approvals](Frontend/public/makeadmin.jpeg)
 
 ### 7. Video Calls (WebRTC-based)
 
 - On the day of a meeting, a room code is shared with both the mentor and the student.
 - Peer-to-peer video calling is enabled via WebRTC.
 - Screen sharing is supported during calls.
-![Video Calls (WebRTC-based)](Frontend/public/video.png)
+![Video Calls (WebRTC-based)](Frontend/public/video.jpeg)
 
 ---
 

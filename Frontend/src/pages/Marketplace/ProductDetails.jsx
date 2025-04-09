@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { Toaster, toast } from "react-hot-toast";
 import { MessageCircle, Heart, ShoppingCart } from "lucide-react";
 
-const SERVER_URL = "https://campus-connect-1tr3.onrender.com/";
+const SERVER_URL = "https://campus-connect-1-7rgs.onrender.com";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -48,7 +48,12 @@ const ProductDetails = () => {
     const checkWishlist = async () => {
       try {
         const response = await axios.get(`${SERVER_URL}/api/marketplace/wishlist`, { withCredentials: true });
-        setIsInWishlist(response.data.some((item) => item.productId === id));
+        let data=response.data.filter((item) => item._id === id);
+        if(data.length>0){
+          setIsInWishlist(true);
+        }else{  
+          setIsInWishlist(false);
+        }
       } catch (error) {
         console.error("Error checking wishlist:", error);
       }
@@ -66,6 +71,7 @@ const ProductDetails = () => {
       toast.success("Added to Wishlist!", {
         style: { background: "#333", color: "#fff" },
       });
+    
     } catch (error) {
       console.error("Error adding to wishlist:", error);
       toast.error("Failed to add to wishlist", {
@@ -400,8 +406,8 @@ const ProductDetails = () => {
                     onClick={handleAddReview}
                     disabled={!reviewText.trim()}
                     className={`flex-1 py-2 rounded-lg transition-all duration-300 ${!reviewText.trim()
-                        ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                        : buttonClasses("primary")
+                      ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                      : buttonClasses("primary")
                       }`}
                   >
                     Submit Review

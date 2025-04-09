@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Stage, Layer, Line } from 'react-konva';
+import { useDebouncedCallback } from 'use-debounce';
 
 const WhiteboardKonva = ({ roomId, socket }) => {
   const [lines, setLines] = useState([]);
@@ -25,6 +26,7 @@ const WhiteboardKonva = ({ roomId, socket }) => {
     };
     handleResize();
     window.addEventListener('resize', handleResize);
+    
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -32,10 +34,10 @@ const WhiteboardKonva = ({ roomId, socket }) => {
   useEffect(() => {
     if (socket && socket.connected) {
       socket.emit('requestWhiteboardData', { roomId });
+
     }
   }, [roomId, socket]);
 
-  // Listen for full whiteboard data and update state
   useEffect(() => {
     if (socket) {
       socket.off('whiteboardData');
@@ -46,6 +48,32 @@ const WhiteboardKonva = ({ roomId, socket }) => {
       });
     }
   }, [roomId, socket]);
+
+  // Clear canvas functionality
+  const handleClearCanvas = () => {
+    setLines([]);
+    if (socket && socket.connected) {
+      socket.emit('clearWhiteboard', { roomId });
+    }
+  };
+
+  const debouncedEmitLine = useDebouncedCallback((updatedLine) => {
+    if (socket && socket.connected) {
+      socket.emit('whiteboardLine', { roomId, line: updatedLine, sender: socket.id });
+    }
+  }, 10); // Reduced debounce time for smoother drawing
+
+  // Listen for clear canvas events from other participants
+  useEffect(() => {
+    if (socket) {
+      socket.on('whiteboardCleared', () => {
+        setLines([]);
+      });
+    }
+    return () => {
+      socket?.off('whiteboardCleared');
+    };
+  }, [socket]);
 
   // Drawing logic
   const handleMouseDown = (e) => {
@@ -66,15 +94,22 @@ const WhiteboardKonva = ({ roomId, socket }) => {
       const lastLine = prev[prev.length - 1];
       const updatedPoints = lastLine.points.concat([pos.x, pos.y]);
       const updatedLine = { ...lastLine, points: updatedPoints };
-      if (socket && socket.connected) {
-        socket.emit('whiteboardLine', { roomId, line: updatedLine, sender: socket.id });
-      }
+      debouncedEmitLine(updatedLine); // Emit the updated line to the server
       return [...prev.slice(0, prev.length - 1), updatedLine];
     });
   };
 
   const handleMouseUp = () => {
     setIsDrawing(false);
+    if(socket && socket.connected) {
+      const lastLine = lines[lines.length - 1];
+      socket.emit('drawC', { roomId, line: lastLine, sender: socket.id });
+      setLines((prev) => {
+        const lastLine = prev[prev.length - 1];
+        
+        return [...prev,lastLine];
+      });
+    }
   };
 
   // Listen for incoming whiteboardLine events
@@ -82,11 +117,15 @@ const WhiteboardKonva = ({ roomId, socket }) => {
     if (socket) {
       socket.off('whiteboardLine');
       socket.on('whiteboardLine', (data) => {
-        console.log("Received whiteboardLine data:", data);
         if (data.sender === socket.id) return;
         if (data.roomId !== roomId) return;
-        setLines((prev) => [...prev, data.line]);
+        setLines((prev) => [...prev.splice(0,prev.length-1), data.line]);
       });
+      socket.on('drawA', (data) => {
+        if (data.sender === socket.id) return;
+        if (data.roomId !== roomId) return;
+        setLines((prev) => [...prev.splice(0,prev.length), data.line]);
+      })
     }
   }, [roomId, socket]);
 
@@ -122,6 +161,7 @@ const WhiteboardKonva = ({ roomId, socket }) => {
                 tension={0.5}
                 lineCap="round"
                 globalCompositeOperation="source-over"
+                lineJoin="round" // Added for smoother joins
               />
             ))}
           </Layer>
@@ -156,6 +196,12 @@ const WhiteboardKonva = ({ roomId, socket }) => {
           className={`px-4 py-2 rounded ${isEraser ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`}
         >
           {isEraser ? 'Disable Eraser' : 'Enable Eraser'}
+        </button>
+        <button
+          onClick={handleClearCanvas}
+          className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+        >
+          Clear Canvas
         </button>
       </div>
     </div>

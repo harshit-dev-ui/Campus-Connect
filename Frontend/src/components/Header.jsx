@@ -16,10 +16,10 @@ import axios from "axios";
 import SearchResultItem from "./SearchResultItem";
 import { toast } from "react-hot-toast";
 import { searchPublicGroups } from "../utils/groupService";
-const socket = io("https://campus-connect-1tr3.onrender.com/", { withCredentials: true });
+const socket = io("https://campus-connect-1-7rgs.onrender.com/", { withCredentials: true });
 
 const apiClient = axios.create({
-  baseURL: "https://campus-connect-1tr3.onrender.com//",
+  baseURL: "https://campus-connect-1-7rgs.onrender.com/",
   headers: {
     "Content-Type": "application/json",
   },
@@ -186,7 +186,7 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "https://campus-connect-1tr3.onrender.com//auth/api/auth/logout",
+        "https://campus-connect-1-7rgs.onrender.com/auth/api/auth/logout",
         {},
         { withCredentials: true }
       );
@@ -249,9 +249,8 @@ const Header = () => {
 
   const renderNotificationsDropdown = () => (
     <div
-      className={`absolute right-0 mt-2 w-80 bg-gray-900 text-gray-200 shadow-2xl rounded-md z-20 ${
-        notificationDropdownOpen ? "animate-fadeIn" : "hidden"
-      }`}
+      className={`absolute right-0 mt-2 w-80 bg-gray-900 text-gray-200 shadow-2xl rounded-md z-20 ${notificationDropdownOpen ? "animate-fadeIn" : "hidden"
+        }`}
     >
       <div className="p-4">
         <h3 className="font-bold mb-3 text-gray-100">Friend Requests</h3>
@@ -289,9 +288,8 @@ const Header = () => {
   const renderMenu = (
     <div
       ref={profileMenuRef}
-      className={`absolute right-0 mt-2 w-48 bg-gray-900 shadow-xl rounded-lg z-10 backdrop-blur-lg border border-gray-800 ${
-        isMenuOpen ? "animate-slideDown" : "hidden"
-      }`}
+      className={`absolute right-0 mt-2 w-48 bg-gray-900 shadow-xl rounded-lg z-10 backdrop-blur-lg border border-gray-800 ${isMenuOpen ? "animate-slideDown" : "hidden"
+        }`}
     >
       <div
         className="p-2 hover:bg-gray-800 cursor-pointer block text-gray-300 transition-all duration-300 first:rounded-t-lg"
@@ -326,9 +324,8 @@ const Header = () => {
   const mobileMenuId = "primary-search-account-menu-mobile";
   const renderMobileMenu = (
     <div
-      className={`absolute right-0 mt-2 w-48 bg-gray-900 shadow-xl rounded-lg z-10 ${
-        isMobileMenuOpen ? "animate-slideDown" : "hidden"
-      }`}
+      className={`absolute right-0 mt-2 w-48 bg-gray-900 shadow-xl rounded-lg z-10 ${isMobileMenuOpen ? "animate-slideDown" : "hidden"
+        }`}
     >
       <div className="p-2 flex items-center text-gray-300 hover:bg-gray-800 transition-all duration-300">
         <MailIcon className="text-gray-400" />
@@ -362,11 +359,10 @@ const Header = () => {
 
   const renderSearchBar = () => (
     <div
-      className={`transition-all duration-300 ${
-        searchOpen
-          ? "fixed top-4 left-1/2 transform -translate-x-1/2 w-2/3 max-w-lg z-50"
-          : "w-40"
-      }`}
+      className={`transition-all duration-300 ${searchOpen
+        ? "fixed top-4 left-1/2 transform -translate-x-1/2 w-2/3 max-w-lg z-50"
+        : "w-40"
+        }`}
     >
       <div className="flex flex-col bg-gray-900 text-gray-200 rounded-lg shadow-xl border border-gray-800 backdrop-blur-lg">
         <div className="flex items-center px-4 py-2">
@@ -627,7 +623,7 @@ const Header = () => {
               <div className="ascii-logo-container">
                 <div className="typewriter-container active">
                   <pre className="ascii-art text-xs">
-{`██╗  ██╗██╗   ██╗██████╗  ███████╗████████╗███████╗██████╗ 
+                    {`██╗  ██╗██╗   ██╗██████╗  ███████╗████████╗███████╗██████╗ 
 ██║  ██║██║   ██║██╔══██╗ ██╔════╝╚══██╔══╝██╔════╝██╔══██╗
 ███████║██║   ██║██████╔╝ ███████╗   ██║   █████╗  ██████╔╝
 ██╔══██║██║   ██║██╔══██╗ ╚════██║   ██║   ██╔══╝  ██╔══██╗
@@ -639,15 +635,15 @@ const Header = () => {
               <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-indigo-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </div>
           </div>
-          <nav 
+          <nav
             className="hidden md:block"
             onMouseEnter={() => setIsMenuHovered(true)}
             onMouseLeave={() => setIsMenuHovered(false)}
           >
             <ul className="flex items-center space-x-8">
               <li className="nav-item">
-                <Link 
-                  to="/dashboard" 
+                <Link
+                  to="/dashboard"
                   className={`font-medium transition-all duration-300 hover:text-white ${activeMenuItem === 'dashboard' ? 'text-white active' : 'text-gray-300'}`}
                   onMouseEnter={() => setActiveMenuItem('dashboard')}
                   onMouseLeave={() => setActiveMenuItem(null)}
@@ -656,8 +652,8 @@ const Header = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link 
-                  to="/doubts" 
+                <Link
+                  to="/doubts"
                   className={`font-medium transition-all duration-300 hover:text-white ${activeMenuItem === 'doubts' ? 'text-white active' : 'text-gray-300'}`}
                   onMouseEnter={() => setActiveMenuItem('doubts')}
                   onMouseLeave={() => setActiveMenuItem(null)}
@@ -666,8 +662,8 @@ const Header = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link 
-                  to="/room" 
+                <Link
+                  to="/room"
                   className={`font-medium transition-all duration-300 hover:text-white ${activeMenuItem === 'room' ? 'text-white active' : 'text-gray-300'}`}
                   onMouseEnter={() => setActiveMenuItem('room')}
                   onMouseLeave={() => setActiveMenuItem(null)}
@@ -676,8 +672,8 @@ const Header = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link 
-                  to="/chats" 
+                <Link
+                  to="/chats"
                   className={`font-medium transition-all duration-300 hover:text-white ${activeMenuItem === 'chats' ? 'text-white active' : 'text-gray-300'}`}
                   onMouseEnter={() => setActiveMenuItem('chats')}
                   onMouseLeave={() => setActiveMenuItem(null)}
@@ -687,21 +683,25 @@ const Header = () => {
               </li>
               <li className="nav-item relative"
                 onMouseEnter={() => {
-                  setIsMentorDropdownOpen(true);
                   setActiveMenuItem('mentors');
+                  setIsMentorDropdownOpen(true);
                 }}
                 onMouseLeave={() => {
-                  setIsMentorDropdownOpen(false);
+                  
                   setActiveMenuItem(null);
+                  setIsMentorDropdownOpen(false);
+
                 }}
               >
                 <span className={`font-medium transition-all duration-300 hover:text-white cursor-pointer ${activeMenuItem === 'mentors' ? 'text-white active' : 'text-gray-300'}`}>
                   Mentors
                 </span>
                 {isMentorDropdownOpen && (
-                  <ul className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-900 rounded-lg shadow-2xl animate-fadeIn border border-gray-800 backdrop-blur-lg min-w-[160px] z-20">
-                    <li className="px-4 py-2 hover:bg-gray-800 transition-all duration-300 rounded-t-lg">
-                      <Link to="/mentors" className="block w-full text-gray-300 hover:text-white">
+                  <ul className="absolute top-full left-1/2 transform -translate-x-1/2 mt-0.5 bg-gray-900 rounded-lg shadow-2xl animate-fadeIn border border-gray-800 backdrop-blur-lg min-w-[160px] z-20"
+                  >
+                    <li className="px-4 py-2 hover:bg-gray-800 transition-all duration-300 rounded-t-lg"
+                    >
+                      <Link  to="/mentors" className="block w-full text-gray-300 hover:text-white">
                         Find Mentors
                       </Link>
                     </li>
@@ -714,8 +714,8 @@ const Header = () => {
                 )}
               </li>
               <li className="nav-item">
-                <Link 
-                  to="/marketplace" 
+                <Link
+                  to="/marketplace"
                   className={`font-medium transition-all duration-300 hover:text-white ${activeMenuItem === 'market' ? 'text-white active' : 'text-gray-300'}`}
                   onMouseEnter={() => setActiveMenuItem('market')}
                   onMouseLeave={() => setActiveMenuItem(null)}
@@ -738,8 +738,8 @@ const Header = () => {
             {renderSearchBar()}
 
             <div className="relative">
-              <button 
-                className="relative p-2 rounded-full hover:bg-gray-800 transition-all duration-300" 
+              <button
+                className="relative p-2 rounded-full hover:bg-gray-800 transition-all duration-300"
                 onClick={handleNotificationClick}
               >
                 <NotificationsIcon className="text-gray-300" />
@@ -751,14 +751,14 @@ const Header = () => {
               </button>
               {renderNotificationsDropdown()}
             </div>
-            <button 
+            <button
               onClick={handleProfileMenuOpen}
               className="p-2 rounded-full hover:bg-gray-800 transition-all duration-300"
             >
               <AccountCircle className="text-gray-300" />
             </button>
-            <button 
-              onClick={handleMobileMenuOpen} 
+            <button
+              onClick={handleMobileMenuOpen}
               className="block md:hidden p-2 rounded-full hover:bg-gray-800 transition-all duration-300"
             >
               <MoreIcon className="text-gray-300" />

@@ -420,9 +420,9 @@ const DoubtsPage = () => {
   }
 
   return (
-    <div className="p-4 min-h-screen bg-[#0A192F] flex flex-col text-[#E0EFFF]">
+    <div className="p-4 min-h-screen bg-gray-950 flex flex-col text-[#E0EFFF]">
       {isLoading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-[#112240] bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900  bg-opacity-50 z-50">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#64FFDA]"></div>
         </div>
       )}
@@ -433,7 +433,7 @@ const DoubtsPage = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="p-2 border rounded-md bg-[#112240] text-[#E0EFFF]"
+            className="p-2 border rounded-md bg-gray-900 text-[#E0EFFF]"
           >
             <option value="">All Categories</option>
             {CATEGORIES.map((cat) => (
@@ -445,7 +445,7 @@ const DoubtsPage = () => {
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
-            className="p-2 border rounded-md ml-2 bg-[#112240] text-[#E0EFFF]"
+            className="p-2 border rounded-md ml-2 bg-gray-900 text-[#E0EFFF]"
           >
             {SORT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -458,7 +458,7 @@ const DoubtsPage = () => {
           <input
             value={tagSearch}
             onChange={(e) => setTagSearch(e.target.value)}
-            className="p-2 border rounded-md bg-[#112240] text-[#E0EFFF]"
+            className="p-2 border rounded-md bg-gray-900 text-[#E0EFFF]"
             placeholder="Search by tag"
           />
         </div>
@@ -483,7 +483,7 @@ const DoubtsPage = () => {
           {questions.map((question) => (
             <div
               key={question._id}
-              className="bg-[#112240] p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+              className=" bg-gray-900 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => handleQuestionClick(question)}
             >
               <div className="flex justify-between items-center mb-3">

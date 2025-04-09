@@ -331,9 +331,9 @@ const QuestionDetail = () => {
   }
 
   return (
-    <div className="p-6 bg-gradient-to-b from-[#0A192F] to-[#112240] min-h-screen text-[#E0EFFF]">
+    <div className="p-6 bg-gradient-to-b bg-gray-950 min-h-screen text-[#E0EFFF]">
       {question && (
-        <div className="mb-8 p-6 rounded-lg bg-[#1C2A3A] shadow-lg">
+        <div className="mb-8 p-6 rounded-lg bg-gray-900 shadow-lg">
           <div className="flex justify-between">
             <h1 className="text-3xl font-bold mb-4 text-[#64FFDA]">
               {question.title}
