@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const SOCKET_URL = "https://campus-connect-1tr3.onrender.com/";
+const SOCKET_URL = "https://campus-connect-1-7rgs.onrender.com/";
 
 export const socket = io(SOCKET_URL);
 

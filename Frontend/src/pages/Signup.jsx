@@ -19,7 +19,7 @@ const Signup = () => {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const response = await axios.get("https://campus-connect-1tr3.onrender.com//auth/dashboard", {
+        const response = await axios.get("https://campus-connect-1-7rgs.onrender.com//auth/dashboard", {
           withCredentials: true,
         });
         if (response.status === 200) {
@@ -38,7 +38,7 @@ const Signup = () => {
 
     const fetchColleges = async () => {
       try {
-        const response = await axios.get("https://campus-connect-1tr3.onrender.com//college/colleges");
+        const response = await axios.get("https://campus-connect-1-7rgs.onrender.com//college/colleges");
         setColleges(response.data.colleges);
       } catch (error) {
         console.error("Error fetching colleges", error);
@@ -63,7 +63,7 @@ const Signup = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post("https://campus-connect-1tr3.onrender.com//auth/signup", {
+      const response = await axios.post("https://campus-connect-1-7rgs.onrender.com//auth/signup", {
         username,
         password,
         email,
@@ -94,7 +94,7 @@ const Signup = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post("https://campus-connect-1tr3.onrender.com//auth/verify-signup", {
+      const response = await axios.post("https://campus-connect-1-7rgs.onrender.com//auth/verify-signup", {
         username,
         password,
         email,
@@ -117,7 +117,7 @@ const Signup = () => {
   const handleResendOtp = async () => {
     try {
       setLoading(true);
-      const response = await axios.post("https://campus-connect-1tr3.onrender.com//auth/signup", {
+      const response = await axios.post("https://campus-connect-1-7rgs.onrender.com//auth/signup", {
         username,
         password,
         email,
