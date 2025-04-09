@@ -101,15 +101,7 @@ const WhiteboardKonva = ({ roomId, socket }) => {
 
   const handleMouseUp = () => {
     setIsDrawing(false);
-    if(socket && socket.connected) {
-      const lastLine = lines[lines.length - 1];
-      socket.emit('drawC', { roomId, line: lastLine, sender: socket.id });
-      setLines((prev) => {
-        const lastLine = prev[prev.length - 1];
-        
-        return [...prev,lastLine];
-      });
-    }
+   
   };
 
   // Listen for incoming whiteboardLine events
@@ -121,12 +113,7 @@ const WhiteboardKonva = ({ roomId, socket }) => {
         if (data.roomId !== roomId) return;
         setLines((prev) => [...prev.splice(0,prev.length),data.line]);
       });
-      socket.on('drawA', (data) => {
-        if (data.sender === socket.id) return;
-        if (data.roomId !== roomId) return;
-        setLines((prev) => [...prev.splice(0,prev.length), data.line,data.line]);
-      })
-    }
+     
   }, [roomId, socket]);
 
   return (
