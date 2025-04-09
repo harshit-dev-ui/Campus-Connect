@@ -113,7 +113,7 @@ const WhiteboardKonva = ({ roomId, socket }) => {
         if (data.roomId !== roomId) return;
         setLines((prev) => [...prev.splice(0,prev.length),data.line]);
       });
-     
+    }
   }, [roomId, socket]);
 
   return (
