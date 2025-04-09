@@ -2,7 +2,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 
 const apiClient = axios.create({
-  baseURL: "https://campus-connect-1-7rgs.onrender.com//api", // Backend URL
+  baseURL: "https://campus-connect-1-7rgs.onrender.com/api", // Backend URL
   withCredentials: true, // Include cookies in requests
 });
 

@@ -21,7 +21,7 @@ const Login = () => {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const response = await axios.get("https://campus-connect-1-7rgs.onrender.com//auth/dashboard", {
+        const response = await axios.get("https://campus-connect-1-7rgs.onrender.com/auth/dashboard", {
           withCredentials: true,
         });
         if (response.status === 200) {
@@ -48,7 +48,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        'https://campus-connect-1-7rgs.onrender.com//auth/login',
+        'https://campus-connect-1-7rgs.onrender.com/auth/login',
         { username, password },
         { withCredentials: true }
       );
@@ -68,7 +68,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        'https://campus-connect-1-7rgs.onrender.com//auth/verify-login',
+        'https://campus-connect-1-7rgs.onrender.com/auth/verify-login',
         { username, otp },
         { withCredentials: true }
       );
@@ -88,7 +88,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        'https://campus-connect-1-7rgs.onrender.com//auth/resend-otp',
+        'https://campus-connect-1-7rgs.onrender.com/auth/resend-otp',
         { username },
         { withCredentials: true }
       );
