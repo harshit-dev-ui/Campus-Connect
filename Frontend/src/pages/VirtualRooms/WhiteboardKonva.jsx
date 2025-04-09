@@ -1,124 +1,159 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Stage, Layer, Line } from 'react-konva';
 import { useDebouncedCallback } from 'use-debounce';
 
 const WhiteboardKonva = ({ roomId, socket }) => {
-  const [lines, setLines] = useState([]);
+  const [lines, setLines] = useState({});
   const [isDrawing, setIsDrawing] = useState(false);
-
-  // Drawing settings with controls
+  const [currentLineId, setCurrentLineId] = useState(null);
   const [currentColor, setCurrentColor] = useState('#000000');
   const [currentBrush, setCurrentBrush] = useState(2);
   const [isEraser, setIsEraser] = useState(false);
-
-  // We'll store the size of our Stage here
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
+  
   const stageRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Adjust Stage size to fill its parent container
-  useEffect(() => {
-    const handleResize = () => {
-      if (!containerRef.current) return;
-      const containerWidth = containerRef.current.offsetWidth;
-      const containerHeight = containerRef.current.offsetHeight;
-      setStageSize({ width: containerWidth, height: containerHeight });
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    
-    return () => window.removeEventListener('resize', handleResize);
+  const handleResize = useCallback(() => {
+    if (!containerRef.current) return;
+    const { offsetWidth, offsetHeight } = containerRef.current;
+    setStageSize({ width: offsetWidth, height: offsetHeight });
   }, []);
 
-  // Request current whiteboard data when component mounts
   useEffect(() => {
-    if (socket && socket.connected) {
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [handleResize]);
+
+  useEffect(() => {
+    if (socket?.connected) {
       socket.emit('requestWhiteboardData', { roomId });
-
     }
   }, [roomId, socket]);
 
   useEffect(() => {
-    if (socket) {
-      socket.off('whiteboardData');
-      socket.on('whiteboardData', (data) => {
-        if (data.roomId === roomId && data.lines) {
-          setLines(data.lines);
-        }
-      });
-    }
+    if (!socket) return;
+
+    const handleWhiteboardData = (data) => {
+      if (data.roomId === roomId && data.lines && typeof data.lines === 'object') {
+        setLines(data.lines);
+      }
+    };
+
+    const handleWhiteboardCleared = (data) => {
+      if (data.roomId === roomId) {
+        setLines({});
+        setIsDrawing(false);
+        setCurrentLineId(null);
+      }
+    };
+
+    socket.on('whiteboardData', handleWhiteboardData);
+    socket.on('whiteboardCleared', handleWhiteboardCleared);
+
+    return () => {
+      socket.off('whiteboardData', handleWhiteboardData);
+      socket.off('whiteboardCleared', handleWhiteboardCleared);
+    };
   }, [roomId, socket]);
 
-  // Clear canvas functionality
-  const handleClearCanvas = () => {
-    setLines([]);
-    if (socket && socket.connected) {
+  const handleClearCanvas = useCallback(() => {
+    setLines({});
+    setIsDrawing(false);
+    setCurrentLineId(null);
+    
+    if (socket?.connected) {
       socket.emit('clearWhiteboard', { roomId });
     }
-  };
+  }, [roomId, socket]);
 
-  const debouncedEmitLine = useDebouncedCallback((updatedLine) => {
-    if (socket && socket.connected) {
-      socket.emit('whiteboardLine', { roomId, line: updatedLine, sender: socket.id });
+  const debouncedEmitLine = useDebouncedCallback((lineId, updatedLine) => {
+    if (socket?.connected) {
+      socket.emit('whiteboardLine', { roomId, lineId, line: updatedLine, sender: socket.id });
     }
-  }, 10); // Reduced debounce time for smoother drawing
+  }, 10);
 
-  // Listen for clear canvas events from other participants
-  useEffect(() => {
-    if (socket) {
-      socket.on('whiteboardCleared', () => {
-        setLines([]);
-      });
-    }
-    return () => {
-      socket?.off('whiteboardCleared');
-    };
-  }, [socket]);
-
-  // Drawing logic
-  const handleMouseDown = (e) => {
+  const handleMouseDown = useCallback((e) => {
     setIsDrawing(true);
-    const pos = stageRef.current.getPointerPosition();
+    const pos = e.target.getStage().getPointerPosition();
     const lineColor = isEraser ? "#ffffff" : currentColor;
-    const newLine = { points: [pos.x, pos.y], color: lineColor, width: currentBrush, tool: 'line' };
-    setLines((prev) => [...prev, newLine]);
-    if (socket && socket.connected) {
-      socket.emit('whiteboardLine', { roomId, line: newLine, sender: socket.id });
+    const lineId = `${socket.id}-${Date.now()}`;
+    
+    const newLine = { 
+      points: [pos.x, pos.y], 
+      color: lineColor, 
+      width: currentBrush, 
+      tool: 'line',
+      userId: socket.id
+    };
+    
+    setCurrentLineId(lineId);
+    setLines(prev => ({ ...prev, [lineId]: newLine }));
+    
+    if (socket?.connected) {
+      socket.emit('whiteboardLine', { roomId, lineId, line: newLine, sender: socket.id });
     }
-  };
+  }, [currentBrush, currentColor, isEraser, roomId, socket]);
 
-  const handleMouseMove = () => {
-    if (!isDrawing) return;
+  const handleMouseMove = useCallback(() => {
+    if (!isDrawing || !currentLineId) return;
+    
     const pos = stageRef.current.getPointerPosition();
-    setLines((prev) => {
-      const lastLine = prev[prev.length - 1];
-      const updatedPoints = lastLine.points.concat([pos.x, pos.y]);
-      const updatedLine = { ...lastLine, points: updatedPoints };
-      debouncedEmitLine(updatedLine); // Emit the updated line to the server
-      return [...prev.slice(0, prev.length - 1), updatedLine];
+    
+    setLines(prev => {
+      if (!prev[currentLineId]) return prev;
+      
+      const updatedLine = {
+        ...prev[currentLineId],
+        points: [...prev[currentLineId].points, pos.x, pos.y]
+      };
+      
+      debouncedEmitLine(currentLineId, updatedLine);
+      
+      return { ...prev, [currentLineId]: updatedLine };
     });
-  };
+  }, [currentLineId, debouncedEmitLine, isDrawing]);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
+    if (!isDrawing) return;
+    
     setIsDrawing(false);
-   
-  };
-
-  // Listen for incoming whiteboardLine events
-  useEffect(() => {
-    if (socket) {
-      socket.off('whiteboardLine');
-      socket.on('whiteboardLine', (data) => {
-        if (data.sender === socket.id) return;
-        if (data.roomId !== roomId) return;
-        setLines((prev) => [...prev.splice(0,prev.length),data.line]);
-      });
+    
+    if (socket?.connected && currentLineId) {
+      const currentLine = lines[currentLineId];
+      if (currentLine) {
+        socket.emit('drawComplete', { roomId, lineId: currentLineId, line: currentLine, sender: socket.id });
+      }
     }
+    
+    setCurrentLineId(null);
+  }, [currentLineId, isDrawing, lines, roomId, socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleWhiteboardLine = (data) => {
+      if (data.sender === socket.id || data.roomId !== roomId) return;
+      setLines(prev => ({ ...prev, [data.lineId]: data.line }));
+    };
+
+    const handleDrawComplete = (data) => {
+      if (data.sender === socket.id || data.roomId !== roomId) return;
+      setLines(prev => ({ ...prev, [data.lineId]: data.line }));
+    };
+
+    socket.on('whiteboardLine', handleWhiteboardLine);
+    socket.on('drawComplete', handleDrawComplete);
+
+    return () => {
+      socket.off('whiteboardLine', handleWhiteboardLine);
+      socket.off('drawComplete', handleDrawComplete);
+    };
   }, [roomId, socket]);
 
   return (
     <div className="relative bg-white rounded-lg shadow-xl p-4 w-full">
-      {/* Container for Stage */}
       <div
         ref={containerRef}
         style={{
@@ -136,26 +171,28 @@ const WhiteboardKonva = ({ roomId, socket }) => {
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
+          onTouchStart={handleMouseDown}
+          onTouchMove={handleMouseMove}
+          onTouchEnd={handleMouseUp}
           style={{ background: '#ffffff' }}
         >
           <Layer>
-            {lines.map((line, i) => (
+            {Object.values(lines).map((line, i) => (
               <Line
-                key={i}
-                points={line.points}
-                stroke={line.color}
-                strokeWidth={line.width}
+                key={`${line.userId}-${i}`}
+                points={line.points || []}
+                stroke={line.color || '#000000'}
+                strokeWidth={line.width || 2}
                 tension={0.5}
                 lineCap="round"
-                globalCompositeOperation="source-over"
-                lineJoin="round" // Added for smoother joins
+                globalCompositeOperation={line.tool === 'eraser' ? 'destination-out' : 'source-over'}
+                lineJoin="round"
               />
             ))}
           </Layer>
         </Stage>
       </div>
 
-      {/* Controls */}
       <div className="mt-4 flex items-center space-x-4">
         <label className="flex items-center space-x-2">
           <span className="text-black">Color:</span>
