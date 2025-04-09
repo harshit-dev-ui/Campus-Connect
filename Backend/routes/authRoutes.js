@@ -230,7 +230,12 @@ const authenticateUser = (req, res, next) => {
 };
 
 router.post("/api/auth/logout", (req, res) => {
-  res.clearCookie("authToken", { httpOnly: true, sameSite: "none" });
+  res.cookie("authToken","", {
+    secure:true,
+    httpOnly: true,
+    sameSite: "none",
+    maxAge: 5 * 24 * 60 * 600 * 1000,
+  });
   res.status(200).json({ message: "Logged out successfully" });
 });
 
