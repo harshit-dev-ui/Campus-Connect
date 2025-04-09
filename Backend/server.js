@@ -132,33 +132,60 @@ io.on("connection", (socket) => {
     });
 
     // Listen for whiteboardLine events and update whiteboard state
-    socket.on("whiteboardLine", ({ roomId, line, sender }) => {
-      if (!whiteboardState[roomId]) whiteboardState[roomId] = [];
-      whiteboardState[roomId].push(line);
-      console.log("Whiteboard line received:", line);
-      io.in(roomId).emit("whiteboardLine", { roomId, line, sender });
+    socket.on('requestWhiteboardData', (data) => {
+    const { roomId } = data;
+    
+    // Initialize the room's whiteboard if it doesn't exist
+    if (!whiteboards[roomId]) {
+      whiteboards[roomId] = { lines: {} };
+    }
+    
+    // Send the current whiteboard data to the client
+    socket.emit('whiteboardData', {
+      roomId,
+      lines: whiteboards[roomId].lines
     });
+  });
 
-    // When a client requests whiteboard data
-    socket.on("requestWhiteboardData", ({ roomId }) => {
-      if (whiteboardState[roomId]) {
-        socket.emit("whiteboardData", {
-          roomId,
-          lines: whiteboardState[roomId],
-        });
-      }
-    });
-    socket.on("drawC",({ roomId, line,sender }) => {
-      io.in(roomId).emit("drawA", { roomId, line, sender });
-    })
+  // Handle new line drawing
+  socket.on('whiteboardLine', (data) => {
+    const { roomId, lineId, line, sender } = data;
+    
+    // Initialize the room's whiteboard if it doesn't exist
+    if (!whiteboards[roomId]) {
+      whiteboards[roomId] = { lines: {} };
+    }
+    
+    // Save the line
+    whiteboards[roomId].lines[lineId] = line;
+    
+    // Broadcast the line to all other clients in the room
+    socket.to(roomId).emit('whiteboardLine', { roomId, lineId, line, sender });
+  });
 
-    // Handle clear canvas event
-    socket.on("clearWhiteboard", ({ roomId }) => {
-      if (whiteboardState[roomId]) {
-        whiteboardState[roomId] = []; // Clear the state in memory
-        io.in(roomId).emit("whiteboardCleared"); // Notify all participants in the room
-      }
-    });
+  // Handle completed drawing
+  socket.on('drawComplete', (data) => {
+    const { roomId, lineId, line, sender } = data;
+    
+    if (whiteboards[roomId]) {
+      whiteboards[roomId].lines[lineId] = line;
+    }
+    
+    socket.to(roomId).emit('drawComplete', { roomId, lineId, line, sender });
+  });
+
+  // Handle clear whiteboard
+  socket.on('clearWhiteboard', (data) => {
+    const { roomId } = data;
+    
+    if (whiteboards[roomId]) {
+      whiteboards[roomId].lines = {};
+    }
+    
+    // Broadcast clear event to all clients in the room (including sender)
+    io.in(roomId).emit('whiteboardCleared', { roomId });
+  });
+
 
 
     // startTimer handler
