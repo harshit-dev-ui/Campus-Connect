@@ -47,7 +47,7 @@ const io = new Server(server, {
 // Add timer management
 const activeTimers = new Map(); // Track active timers per room
 const users = new Map(); // Track online users
-const whiteboardState = {}; // Store whiteboard lines for each room
+const whiteboards = {}; // Store whiteboard lines for each room
 
 // Middleware
 app.use(cookieParser());
