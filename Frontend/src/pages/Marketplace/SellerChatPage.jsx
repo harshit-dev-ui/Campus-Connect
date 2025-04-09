@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { Toaster, toast } from "react-hot-toast";
 
-const SERVER_URL = "https://campus-connect-1-7rgs.onrender.com/";
+const SERVER_URL = "https://campus-connect-1-7rgs.onrender.com";
 
 const SellerChatPage = () => {
   const { sellerId } = useParams();
