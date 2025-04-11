@@ -1,4 +1,5 @@
-[# Campus Connect][#htts://hubster.onrender.com]
+# [Campus Connect](https://hubster.onrender.com)
+
 
 A platform for students to connect, collaborate, and manage academic activities.
 
